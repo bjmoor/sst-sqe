@@ -20,49 +20,53 @@
 export SST_ROOT=`pwd`
 
 echo "#############################################################"
-echo "  Version Oct 8 1621 "
+echo "  Version Oct 13 1351 hours "
 echo ' '
 pwd
 ls -la
 echo ' '
 
-echo "     git clone  https://github.com/sstsimulator/sst . "
-git clone -b devel https://github.com/sstsimulator/sst .
-retVal=$?
-if [ $retVal != 0 ] ; then
-   echo "\"git clone \" FAILED.  retVal = $retVal"
-   exit
+#    Clone other repositories except on second pass thru Bamboo
+if [[ ${SST_TEST_ROOT:+isSet} != isSet ]] ; then
+    echo "PWD = `pwd`"
+    echo "     git clone  https://github.com/sstsimulator/sst . "
+    git clone -b devel https://github.com/sstsimulator/sst .
+    retVal=$?
+    if [ $retVal != 0 ] ; then
+       echo "\"git clone \" FAILED.  retVal = $retVal"
+       exit
+    fi
+    echo " "
+    echo " the sst Repo has been cloned.    core and elements to go"
+    ls
+
+
+    mkdir -p sst
+    pushd sst
+    pwd
+    ls -l
+
+    echo "     git clone -b devel https://github.com/sstsimulator/sst-core core "
+    git clone -b devel https://github.com/sstsimulator/sst-core core
+    retVal=$?
+    if [ $retVal != 0 ] ; then
+       echo "\"git of sst-core \" FAILED.  retVal = $retVal"
+       exit
+    fi
+
+    echo "     git clone -b devel https://github.com/sstsimulator/sst-elements elements "
+    git clone -b devel https://github.com/sstsimulator/sst-elements elements
+    retVal=$?
+    if [ $retVal != 0 ] ; then
+       echo "\"git of sst-elements \" FAILED.  retVal = $retVal"
+       exit
+    fi
+
+    ls -l
+    popd
+    mv ../sqe/buildsys/deps .
+    mv ../sqe/test .
 fi
-echo " "
-echo " the sst Repo has been cloned.    core and elements to go"
-ls
-
-
-mkdir -p sst
-pushd sst
-pwd
-ls -l
-
-echo "     git clone -b devel https://github.com/sstsimulator/sst-core core "
-git clone -b devel https://github.com/sstsimulator/sst-core core
-retVal=$?
-if [ $retVal != 0 ] ; then
-   echo "\"git of sst-core \" FAILED.  retVal = $retVal"
-   exit
-fi
-
-echo "     git clone -b devel https://github.com/sstsimulator/sst-elements elements "
-git clone -b devel https://github.com/sstsimulator/sst-elements elements
-retVal=$?
-if [ $retVal != 0 ] ; then
-   echo "\"git of sst-elements \" FAILED.  retVal = $retVal"
-   exit
-fi
-
-ls -l
-popd
-mv ../sqe/buildsys/deps .
-mv ../sqe/test .
 
 #	This assumes a directory strucure
 #                     SST_BASE   (was $HOME)
